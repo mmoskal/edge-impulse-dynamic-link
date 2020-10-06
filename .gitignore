@@ -1,0 +1,5 @@
+build/
+tflite-model
+model-parameters
+edge-impulse-sdk
+tmp
