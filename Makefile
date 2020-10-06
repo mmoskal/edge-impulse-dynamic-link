@@ -1,6 +1,6 @@
 # this will depend on MCU
 # the RAM (data/BSS) section will start here:
-COMM_START ?= 0x20001000
+COMM_START ?= 0x20002000
 # tha maximum size of RAM
 COMM_SIZE ?= 2K
 # the flash (text) should be loaded at this address 
@@ -114,7 +114,7 @@ $(LD_SCRIPT): Makefile .force
 	mkdir -p $(BUILD)
 	: > $@
 	echo "MEMORY {" >> $@
-	echo "RAM (rwx)   : ORIGIN = 0x20000000 + $(COMM_START), LENGTH = $(COMM_SIZE)" >> $@
-	echo "FLASH (rx)  : ORIGIN = 0x0 + $(FLASH_START), LENGTH = $(FLASH_SIZE)" >> $@
+	echo "RAM (rwx)   : ORIGIN = $(COMM_START), LENGTH = $(COMM_SIZE)" >> $@
+	echo "FLASH (rx)  : ORIGIN = $(FLASH_START), LENGTH = $(FLASH_SIZE)" >> $@
 	echo "}" >> $@
 	echo "INCLUDE common.ld" >> $@

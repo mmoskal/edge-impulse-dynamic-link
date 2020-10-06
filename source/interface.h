@@ -12,7 +12,8 @@ struct import_vectors {
   int (*vprintf)(const char *fmt, va_list ap);
   uint32_t (*get_time_ms)();
   uint64_t (*get_time_us)();
-  uint32_t paddingInterface[32 - 6];
+
+  uint32_t paddingInterface[32 - 5];
 };
 
 struct interface_vectors {
@@ -29,11 +30,12 @@ struct interface_vectors {
   uint32_t num_classifier_labels;
   uint32_t has_anomaly;
   const char **labels;
+
   uint32_t paddingAttributes[32 - 6];
 
   void (*ei_init)(void *comm_data, uint32_t comm_size);
   int (*ei_classify)(const float *data, unsigned numdata, float *classification);
-  uint32_t paddingEntries[14];
+  uint32_t paddingEntries[16 - 2];
 };
 
 extern const struct interface_vectors vectors;
