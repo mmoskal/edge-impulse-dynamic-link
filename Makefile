@@ -1,3 +1,13 @@
+# this will depend on MCU
+# the RAM (data/BSS) section will start here:
+COMM_START ?= 0x20001000
+# tha maximum size of RAM
+COMM_SIZE ?= 2K
+# the flash (text) should be loaded at this address 
+FLASH_START ?= 0x8060008
+# the maximum size of flash
+FLASH_SIZE ?= 128K
+
 PREF = arm-none-eabi-
 COMMON_FLAGS = \
 	-mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DTF_LITE_MCU_DEBUG_LOG \
@@ -50,6 +60,8 @@ CFLAGS += -Iedge-impulse-sdk/dsp
 CFLAGS += -Iedge-impulse-sdk/dsp/kissfft
 CFLAGS += -Iedge-impulse-sdk/porting
 
+EXE = eimodel
+
 SRC = $(wildcard  \
 	edge-impulse-sdk/dsp/kissfft/*.cpp \
 	edge-impulse-sdk/dsp/dct/*.cpp \
@@ -68,8 +80,8 @@ OBJ := $(OBJ:.c=.o)
 OBJ := $(OBJ:.cc=.o)
 OBJ := $(addprefix $(BUILD)/,$(OBJ))
 
-#LDFLAGS = -Wl,-Map -Wl,$(BUILD)/run.map -nodefaultlibs -lm mylib.a -lgcc
-LDFLAGS = -Wl,-Map -Wl,$(BUILD)/run.map -lm \
+#LDFLAGS = -Wl,-Map -Wl,$(BUILD)/$(EXE).map -nodefaultlibs -lm mylib.a -lgcc
+LDFLAGS = -Wl,-Map -Wl,$(BUILD)/$(EXE).map -lm \
 	-specs=nosys.specs -specs=nano.specs \
 	-T"$(LD_SCRIPT)" -Wl,--gc-sections
 
@@ -79,8 +91,8 @@ all:
 .PHONY: $(BUILD) clean
 
 $(BUILD): $(OBJ) $(LD_SCRIPT)
-	$(CXX) $(MACROS) $(CXXFLAGS) -o $(BUILD)/run $(OBJ) $(LDFLAGS) 
-	$(PREF)objcopy -O binary $(BUILD)/run $(BUILD)/run.bin
+	$(CXX) $(MACROS) $(CXXFLAGS) -o $(BUILD)/$(EXE) $(OBJ) $(LDFLAGS) 
+	$(PREF)objcopy -O binary $(BUILD)/$(EXE) $(BUILD)/$(EXE).bin
 
 $(BUILD)/%.o: %.c
 	@mkdir -p `dirname $@`
@@ -97,13 +109,9 @@ $(BUILD)/%.o: %.cc
 clean:
 	rm -rf $(BUILD)/
 
-# this will depend on MCU
-COMM_START ?= 4K
-COMM_SIZE ?= 2K
-FLASH_START ?= 0x8060008
-FLASH_SIZE ?= 128K
+.force:
 
-$(LD_SCRIPT): Makefile
+$(LD_SCRIPT): Makefile .force
 	mkdir -p $(BUILD)
 	: > $@
 	echo "MEMORY {" >> $@
