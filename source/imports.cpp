@@ -9,7 +9,9 @@ void abort(void) {
 }
 void exit(int r) { abort(); }
 
-void *realloc(void *ptr, size_t size) { return vectors.imports.realloc(ptr, size); }
+void *realloc(void *ptr, size_t size) {
+  return vectors.imports.realloc(ptr, size);
+}
 void *malloc(size_t sz) { return realloc(NULL, sz); }
 void free(void *ptr) {
   void *dummy = realloc(ptr, 0);
@@ -43,9 +45,9 @@ size_t fwrite(const void *errmsg, size_t x, size_t y, void *f) {
 }
 
 void __assert_func() { abort(); }
+} // extern C
 
 void DebugLog(const char *s) { printf("%s", s); }
-
 
 int ei_run_impulse_check_canceled() { return 0; }
 
@@ -68,9 +70,6 @@ void ei_printf(const char *format, ...) {
 void ei_printf_float(float f) {
   // TODO
   ei_printf("%f", f);
-}
-
-
 }
 
 void *operator new(size_t sz) { return malloc(sz); }
