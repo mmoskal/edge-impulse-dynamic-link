@@ -2,7 +2,7 @@
 # the RAM (data/BSS) section will start here:
 COMM_START ?= 0x20002000
 # tha maximum size of RAM
-COMM_SIZE ?= 2K
+COMM_SIZE ?= 4K
 # the flash (text) should be loaded at this address 
 FLASH_START ?= 0x8060008
 # the maximum size of flash
