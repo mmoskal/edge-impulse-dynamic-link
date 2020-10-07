@@ -26,11 +26,25 @@ CXXFLAGS = $(COMMON_FLAGS) \
 
 MACROS += -DTF_LITE_DISABLE_X86_NEON
 MACROS += -DEIDSP_SIGNAL_C_FN_POINTER=1
+MACROS += -D__TARGET_CPU_CORTEX_M4=1
+
+COMMON_INC = \
+-Iedge-impulse-sdk/CMSIS/Core/Include \
+-Iedge-impulse-sdk/CMSIS/DSP/Include \
+-Iedge-impulse-sdk/CMSIS/DSP/PrivateInclude \
+-I. \
+-Isource \
+-Iedge-impulse-sdk \
+-Imodel-parameters \
+-Itflite-model \
+-Iedge-impulse-sdk/anomaly \
+-Iedge-impulse-sdk/classifier \
+-Iedge-impulse-sdk/dsp \
+-Iedge-impulse-sdk/dsp/kissfft \
+-Iedge-impulse-sdk/porting \
 
 CXXFLAGS += -std=c++11
-CXXFLAGS += -I.
-CXXFLAGS += -Isource
-CXXFLAGS += -Iedge-impulse-sdk
+CXXFLAGS += $(COMMON_INC)
 CXXFLAGS += -Iedge-impulse-sdk/tensorflow
 CXXFLAGS += -Iedge-impulse-sdk/third_party
 CXXFLAGS += -Iedge-impulse-sdk/third_party/flatbuffers
@@ -40,24 +54,9 @@ CXXFLAGS += -Iedge-impulse-sdk/third_party/gemmlowp/
 CXXFLAGS += -Iedge-impulse-sdk/third_party/gemmlowp/fixedpoint
 CXXFLAGS += -Iedge-impulse-sdk/third_party/gemmlowp/internal
 CXXFLAGS += -Iedge-impulse-sdk/third_party/ruy
-CXXFLAGS += -Imodel-parameters
-CXXFLAGS += -Itflite-model
-CXXFLAGS += -Iedge-impulse-sdk/anomaly
-CXXFLAGS += -Iedge-impulse-sdk/classifier
-CXXFLAGS += -Iedge-impulse-sdk/dsp
-CXXFLAGS += -Iedge-impulse-sdk/dsp/kissfft
-CXXFLAGS += -Iedge-impulse-sdk/porting
 
-CFLAGS += -I.
-CFLAGS += -Isource
-CFLAGS += -Iedge-impulse-sdk
-CFLAGS += -Imodel-parameters
-CFLAGS += -Itflite-model
-CFLAGS += -Iedge-impulse-sdk/anomaly
-CFLAGS += -Iedge-impulse-sdk/classifier
-CFLAGS += -Iedge-impulse-sdk/dsp
-CFLAGS += -Iedge-impulse-sdk/dsp/kissfft
-CFLAGS += -Iedge-impulse-sdk/porting
+CFLAGS += $(COMMON_INC)
+
 
 EXE = eimodel
 
@@ -72,6 +71,8 @@ SRC = $(wildcard  \
 	edge-impulse-sdk/tensorflow/lite/core/api/*.cc \
 	edge-impulse-sdk/dsp/memory.cpp \
 	edge-impulse-sdk/tensorflow/lite/c/common.c  \
+	edge-impulse-sdk/CMSIS/NN/Source/*/*.c \
+	edge-impulse-sdk/CMSIS/DSP/Source/*/*.c \
 	tflite-model/*.cpp \
 	source/*.c*)
 OBJ := $(SRC:.cpp=.o)
