@@ -85,26 +85,32 @@ LDFLAGS = -Wl,-Map -Wl,$(BUILD)/$(EXE).map -lm \
 	-specs=nosys.specs -specs=nano.specs \
 	-T"$(LD_SCRIPT)" -Wl,--gc-sections
 
+QUIET ?= @
+
 all:
 	$(MAKE) -j16 $(BUILD)
 
 .PHONY: $(BUILD) clean
 
 $(BUILD): $(OBJ) $(LD_SCRIPT)
-	$(CXX) $(MACROS) $(CXXFLAGS) -o $(BUILD)/$(EXE) $(OBJ) $(LDFLAGS) 
+	@echo LD $@
+	$(QUIET)$(CXX) $(MACROS) $(CXXFLAGS) -o $(BUILD)/$(EXE) $(OBJ) $(LDFLAGS) 
 	$(PREF)objcopy -O binary $(BUILD)/$(EXE) $(BUILD)/$(EXE).bin
 
 $(BUILD)/%.o: %.c
 	@mkdir -p `dirname $@`
-	$(CC) -c $(MACROS) $(CFLAGS) $< -o $@
+	@echo CC $<
+	$(QUIET)$(CC) -c $(MACROS) $(CFLAGS) $< -o $@
 
 $(BUILD)/%.o: %.cpp
 	@mkdir -p `dirname $@`
-	$(CXX) -c $(MACROS) $(CXXFLAGS) $< -o $@
+	@echo CXX $<
+	$(QUIET)$(CXX) -c $(MACROS) $(CXXFLAGS) $< -o $@
 
 $(BUILD)/%.o: %.cc
 	@mkdir -p `dirname $@`
-	$(CXX) -c $(MACROS) $(CXXFLAGS) $< -o $@
+	@echo CXX $<
+	$(QUIET)$(CXX) -c $(MACROS) $(CXXFLAGS) $< -o $@
 
 clean:
 	rm -rf $(BUILD)/
@@ -112,10 +118,11 @@ clean:
 .force:
 
 $(LD_SCRIPT): Makefile .force
-	mkdir -p $(BUILD)
-	: > $@
-	echo "MEMORY {" >> $@
-	echo "RAM (rwx)   : ORIGIN = $(COMM_START), LENGTH = $(COMM_SIZE)" >> $@
-	echo "FLASH (rx)  : ORIGIN = $(FLASH_START), LENGTH = $(FLASH_SIZE)" >> $@
-	echo "}" >> $@
-	echo "INCLUDE common.ld" >> $@
+	@echo MK-LD $@
+	$(QUIET)mkdir -p $(BUILD)
+	$(QUIET): > $@
+	$(QUIET)echo "MEMORY {" >> $@
+	$(QUIET)echo "RAM (rwx)   : ORIGIN = $(COMM_START), LENGTH = $(COMM_SIZE)" >> $@
+	$(QUIET)echo "FLASH (rx)  : ORIGIN = $(FLASH_START), LENGTH = $(FLASH_SIZE)" >> $@
+	$(QUIET)echo "}" >> $@
+	$(QUIET)echo "INCLUDE common.ld" >> $@
