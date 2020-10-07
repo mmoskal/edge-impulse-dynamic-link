@@ -10,8 +10,10 @@ FLASH_SIZE ?= 128K
 
 PREF = arm-none-eabi-
 COMMON_FLAGS = \
+	-Os -g \
 	-mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DTF_LITE_MCU_DEBUG_LOG \
-	-fdata-sections -ffunction-sections
+	-fdata-sections -ffunction-sections \
+	-Wno-strict-aliasing
 
 CC = $(PREF)gcc
 CXX = $(PREF)gcc
@@ -19,8 +21,8 @@ CXX = $(PREF)gcc
 BUILD = build
 LD_SCRIPT = $(BUILD)/linker.ld
 
-CFLAGS = $(COMMON_FLAGS) -Wall
-CXXFLAGS = $(COMMON_FLAGS) \
+CFLAGS =  -Wall $(COMMON_FLAGS)
+CXXFLAGS = -Wall $(COMMON_FLAGS) \
 	-fwrapv -fno-rtti -fno-threadsafe-statics -fno-exceptions \
 	-fno-unwind-tables -Wl,--gc-sections -Wl,--sort-common -Wl,--sort-section=alignment -Wno-array-bounds
 
@@ -95,7 +97,8 @@ all:
 $(BUILD): $(OBJ) $(LD_SCRIPT)
 	@echo LD $@
 	$(QUIET)$(CXX) $(MACROS) $(CXXFLAGS) -o $(BUILD)/$(EXE) $(OBJ) $(LDFLAGS) 
-	$(PREF)objcopy -O binary $(BUILD)/$(EXE) $(BUILD)/$(EXE).bin
+	$(QUIET)$(PREF)size $(BUILD)/$(EXE)
+	$(QUIET)$(PREF)objcopy -O binary $(BUILD)/$(EXE) $(BUILD)/$(EXE).bin
 
 $(BUILD)/%.o: %.c
 	@mkdir -p `dirname $@`
