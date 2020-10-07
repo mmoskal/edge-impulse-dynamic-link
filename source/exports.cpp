@@ -38,7 +38,7 @@ extern uint32_t _sidata, _sdata, _edata, _ebss;
 static void my_init(void *comm_data, uint32_t comm_size) {
   if (comm_data != &_sdata)
     abort();
-  if ((uint8_t *)&_ebss - (uint8_t *)comm_data > comm_size)
+  if ((uint8_t *)&_ebss - (uint8_t *)comm_data > (int)comm_size)
     abort();
   uint32_t *dst = &_sdata;
   uint32_t *end = &_edata;

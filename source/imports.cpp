@@ -41,7 +41,7 @@ int printf(const char *format, ...) {
 
 // gcc optimizes printf() to fwrite()
 size_t fwrite(const void *errmsg, size_t x, size_t y, void *f) {
-  return printf("%s", errmsg);
+  return printf("%s", (const char *)errmsg);
 }
 
 void __assert_func() { abort(); }
