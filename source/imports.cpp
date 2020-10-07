@@ -69,7 +69,7 @@ void ei_printf(const char *format, ...) {
 
 void ei_printf_float(float f) {
   // TODO
-  ei_printf("%f", f);
+  ei_printf("%d/", (int)(f * 1000));
 }
 
 void *operator new(size_t sz) { return malloc(sz); }

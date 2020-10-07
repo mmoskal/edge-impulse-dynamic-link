@@ -1,0 +1,102 @@
+diff --git a/CMSIS/DSP/Source/TransformFunctions/arm_cfft_init_f32.c b/CMSIS/DSP/Source/TransformFunctions/arm_cfft_init_f32.c
+index 653038d..b94f98c 100755
+--- a/CMSIS/DSP/Source/TransformFunctions/arm_cfft_init_f32.c
++++ b/CMSIS/DSP/Source/TransformFunctions/arm_cfft_init_f32.c
+@@ -156,6 +156,7 @@ arm_status arm_cfft_init_f32(
+                                                                                 
+         /*  Initializations of Instance structure depending on the FFT length */
+         switch (S->fftLen) {                                                    
++#ifndef EIDSP_SMALL_FFT
+             /*  Initializations of structure parameters for 4096 point FFT */   
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || defined(ARM_TABLE_BITREVIDX_FXT_4096)                                                           
+         case 4096U:  
+@@ -188,6 +189,7 @@ arm_status arm_cfft_init_f32(
+             status=arm_cfft_radix4by2_rearrange_twiddles_f32(S, 1);           
+             break;                                                              
+ #endif 
++#endif 
+ 
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || defined(ARM_TABLE_BITREVIDX_FXT_512)                                                           
+             /*  Initializations of structure parameters for 512 point FFT */    
+@@ -272,6 +274,7 @@ arm_status arm_cfft_init_f32(
+ 
+         /*  Initializations of Instance structure depending on the FFT length */
+         switch (S->fftLen) {
++#ifndef EIDSP_SMALL_FFT
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || (defined(ARM_TABLE_TWIDDLECOEF_F32_4096) && defined(ARM_TABLE_BITREVIDX_FLT_4096))
+             /*  Initializations of structure parameters for 4096 point FFT */
+         case 4096U:
+@@ -297,6 +300,7 @@ arm_status arm_cfft_init_f32(
+ 
+             break;
+ #endif
++#endif
+ 
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || (defined(ARM_TABLE_TWIDDLECOEF_F32_512) && defined(ARM_TABLE_BITREVIDX_FLT_512))
+             /*  Initializations of structure parameters for 512 point FFT */
+diff --git a/CMSIS/DSP/Source/TransformFunctions/arm_rfft_fast_init_f32.c b/CMSIS/DSP/Source/TransformFunctions/arm_rfft_fast_init_f32.c
+index d57ed0b..60fe6c8 100644
+--- a/CMSIS/DSP/Source/TransformFunctions/arm_rfft_fast_init_f32.c
++++ b/CMSIS/DSP/Source/TransformFunctions/arm_rfft_fast_init_f32.c
+@@ -188,6 +188,7 @@ static arm_status arm_rfft_512_fast_init_f32( arm_rfft_fast_instance_f32 * S ) {
+ }
+ #endif 
+ 
++#ifndef EIDSP_SMALL_FFT
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || (defined(ARM_TABLE_TWIDDLECOEF_F32_512) && defined(ARM_TABLE_BITREVIDX_FLT_512) && defined(ARM_TABLE_TWIDDLECOEF_F32_512) && defined(ARM_TABLE_TWIDDLECOEF_RFFT_F32_1024))
+ /**
+   @private
+@@ -273,6 +274,7 @@ static arm_status arm_rfft_4096_fast_init_f32( arm_rfft_fast_instance_f32 * S )
+   return ARM_MATH_SUCCESS;
+ }
+ #endif 
++#endif
+ 
+ /**
+   @brief         Initialization function for the floating-point real FFT.
+@@ -298,6 +300,7 @@ arm_status arm_rfft_fast_init_f32(
+ 
+   switch (fftLen)
+   {
++#ifndef EIDSP_SMALL_FFT
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || (defined(ARM_TABLE_TWIDDLECOEF_F32_2048) && defined(ARM_TABLE_BITREVIDX_FLT_2048) && defined(ARM_TABLE_TWIDDLECOEF_F32_2048) && defined(ARM_TABLE_TWIDDLECOEF_RFFT_F32_4096))
+   case 4096U:
+     fptr = arm_rfft_4096_fast_init_f32;
+@@ -313,6 +316,7 @@ arm_status arm_rfft_fast_init_f32(
+     fptr = arm_rfft_1024_fast_init_f32;
+     break;
+ #endif
++#endif
+ #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || (defined(ARM_TABLE_TWIDDLECOEF_F32_256) && defined(ARM_TABLE_BITREVIDX_FLT_256) && defined(ARM_TABLE_TWIDDLECOEF_F32_256) && defined(ARM_TABLE_TWIDDLECOEF_RFFT_F32_512))
+   case 512U:
+     fptr = arm_rfft_512_fast_init_f32;
+diff --git a/dsp/numpy.hpp b/dsp/numpy.hpp
+index 7012768..c306fec 100644
+--- a/dsp/numpy.hpp
++++ b/dsp/numpy.hpp
+@@ -1111,7 +1111,11 @@ public:
+ 
+ #if EIDSP_USE_CMSIS_DSP
+         if (n_fft != 32 && n_fft != 64 && n_fft != 128 && n_fft != 256 &&
+-            n_fft != 512 && n_fft != 1024 && n_fft != 2048 && n_fft != 4096) {
++            n_fft != 512 
++#ifndef EIDSP_SMALL_FFT
++            && n_fft != 1024 && n_fft != 2048 && n_fft != 4096
++#endif
++            ) {
+             int ret = software_rfft(fft_input.buffer, output, n_fft, n_fft_out_features);
+             if (ret != EIDSP_OK) {
+                 EIDSP_ERR(ret);
+@@ -1195,7 +1199,11 @@ public:
+ 
+ #if EIDSP_USE_CMSIS_DSP
+         if (n_fft != 32 && n_fft != 64 && n_fft != 128 && n_fft != 256 &&
+-            n_fft != 512 && n_fft != 1024 && n_fft != 2048 && n_fft != 4096) {
++            n_fft != 512
++#ifndef EIDSP_SMALL_FFT
++            && n_fft != 1024 && n_fft != 2048 && n_fft != 4096
++#endif
++            ) {
+             int ret = software_rfft(fft_input.buffer, output, n_fft, n_fft_out_features);
+             if (ret != EIDSP_OK) {
+                 EIDSP_ERR(ret);

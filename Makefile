@@ -15,8 +15,8 @@ COMMON_FLAGS = \
 	-fdata-sections -ffunction-sections \
 	-Wno-strict-aliasing
 
-CC = $(PREF)gcc
-CXX = $(PREF)gcc
+CC = $(CCACHE) $(PREF)gcc
+CXX = $(CCACHE) $(PREF)gcc
 
 BUILD = build
 LD_SCRIPT = $(BUILD)/linker.ld
@@ -29,6 +29,7 @@ CXXFLAGS = -Wall $(COMMON_FLAGS) \
 MACROS += -DTF_LITE_DISABLE_X86_NEON
 MACROS += -DEIDSP_SIGNAL_C_FN_POINTER=1
 MACROS += -D__TARGET_CPU_CORTEX_M4=1
+MACROS += -DEIDSP_SMALL_FFT=1
 
 COMMON_INC = \
 -Iedge-impulse-sdk/CMSIS/Core/Include \
